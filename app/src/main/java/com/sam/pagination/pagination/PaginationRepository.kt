@@ -1,11 +1,23 @@
 package com.sam.pagination.pagination
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class PaginationRepository @Inject constructor(
-    private val gitHubApi: GitHubApi
+    private val api: GitHubApi
 ) {
-    suspend fun searchRepositories(page: Int, pageSize: Int){
-        gitHubApi.searchRepositories(page = page, pageSize = pageSize )
+    fun searchRepositories( pageSize: Int = 20): Flow<PagingData<Repository>> {
+
+        return Pager(config = PagingConfig(
+            pageSize = pageSize,
+            initialLoadSize = 40,
+            prefetchDistance = 10
+            )
+        ){
+            RepositoryPagingSource(api)
+        }.flow
     }
 }
